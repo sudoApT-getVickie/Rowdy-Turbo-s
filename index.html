@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D Endless Driving - Phase 2</title>
+    <title>2D Endless Driving - Phase 3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -42,14 +42,28 @@
     <!-- Game Viewport Wrapper -->
     <div class="relative w-full max-w-5xl aspect-[21/9] sm:aspect-[16/7] bg-black sm:rounded-lg overflow-hidden border-0 sm:border-2 border-gray-700 shadow-2xl flex flex-col justify-between">
         
+        <!-- Fuel Bar UI (NEW) -->
+        <div class="absolute top-0 left-0 w-full h-3 bg-gray-800 z-20 border-b border-gray-700">
+            <div id="fuelBar" class="h-full bg-green-500 transition-all duration-75 ease-linear" style="width: 100%;"></div>
+        </div>
+
         <!-- The Game World -->
         <canvas id="gameCanvas" class="block w-full h-full absolute top-0 left-0 z-0"></canvas>
 
+        <!-- Game Over Modal (NEW) -->
+        <div id="gameOverModal" class="absolute inset-0 bg-black/80 z-30 hidden flex-col items-center justify-center backdrop-blur-sm">
+            <h1 class="text-4xl sm:text-6xl text-red-500 font-black mb-2 tracking-widest drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]">OUT OF GAS</h1>
+            <p class="text-gray-300 mb-8 font-mono">Distance traveled: <span id="finalScore" class="text-white font-bold">0</span>m</p>
+            <button id="btnRestart" class="px-8 py-3 bg-transparent border-2 border-red-500 text-red-400 hover:bg-red-500 hover:text-black font-bold uppercase rounded transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                Restart Engine
+            </button>
+        </div>
+
         <!-- Phase 2 Dashboard UI Overlay -->
-        <div id="dashboardOverlay" class="relative z-10 w-full h-32 sm:h-40 mt-auto bg-gradient-to-t from-black via-gray-900/90 to-transparent flex justify-between items-end px-4 sm:px-12 pb-2 sm:pb-6">
+        <div id="dashboardOverlay" class="relative z-10 w-full h-32 sm:h-40 mt-auto bg-gradient-to-t from-black via-gray-900/90 to-transparent flex justify-between items-end px-4 sm:px-12 pb-2 sm:pb-6 pointer-events-none">
             
             <!-- Left: Brake Pedal -->
-            <button id="btnBrake" class="pedal w-16 h-20 sm:w-20 sm:h-28 rounded-md flex items-center justify-center border border-gray-500 cursor-pointer touch-manipulation z-20">
+            <button id="btnBrake" class="pedal pointer-events-auto w-16 h-20 sm:w-20 sm:h-28 rounded-md flex items-center justify-center border border-gray-500 cursor-pointer touch-manipulation z-20">
                 <div class="grid grid-cols-2 gap-1 opacity-50">
                     <div class="w-2 h-2 bg-gray-300 rounded-full"></div><div class="w-2 h-2 bg-gray-300 rounded-full"></div>
                     <div class="w-2 h-2 bg-gray-300 rounded-full"></div><div class="w-2 h-2 bg-gray-300 rounded-full"></div>
@@ -57,262 +71,7 @@
             </button>
 
             <!-- Center: Telemetry Dials -->
-            <div class="flex space-x-2 sm:space-x-8 items-end pb-2">
+            <div class="flex space-x-2 sm:space-x-8 items-end pb-2 pointer-events-auto">
                 <!-- Tachometer (RPM) -->
                 <div class="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full dial-bg flex items-center justify-center">
-                    <div class="absolute text-[10px] sm:text-xs text-gray-400 font-bold top-4 uppercase tracking-widest">RPM x1000</div>
-                    <div id="rpmText" class="absolute bottom-4 text-xs sm:text-sm font-mono text-red-500 font-bold">1.0</div>
-                    <!-- RPM Needle -->
-                    <div id="rpmNeedle" class="needle absolute w-1 h-10 sm:h-14 bg-red-600 bottom-1/2 rounded-t-full shadow-[0_0_5px_rgba(220,38,38,0.8)]" style="transform: rotate(-135deg);"></div>
-                </div>
-
-                <!-- Central Data Panel -->
-                <div class="flex flex-col items-center justify-end h-full pb-4 space-y-2">
-                    <div class="bg-gray-800 border border-gray-600 px-3 py-1 rounded shadow-inner text-center">
-                        <div class="text-[8px] sm:text-[10px] text-gray-400 uppercase tracking-widest">Gear</div>
-                        <div id="gearDisplay" class="text-xl sm:text-2xl font-black text-cyan-400 font-mono">1</div>
-                    </div>
-                </div>
-
-                <!-- Speedometer (MPH) -->
-                <div class="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full dial-bg flex items-center justify-center">
-                    <div class="absolute text-[10px] sm:text-xs text-gray-400 font-bold top-4 uppercase tracking-widest">MPH</div>
-                    <div id="mphText" class="absolute bottom-4 text-xs sm:text-sm font-mono text-white font-bold">0</div>
-                    <!-- MPH Needle -->
-                    <div id="mphNeedle" class="needle absolute w-1 h-10 sm:h-14 bg-white bottom-1/2 rounded-t-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" style="transform: rotate(-135deg);"></div>
-                </div>
-            </div>
-
-            <!-- Right: Gas Pedal -->
-            <button id="btnGas" class="pedal w-12 h-24 sm:w-16 sm:h-32 rounded-md flex flex-col items-center justify-center border border-gray-500 cursor-pointer touch-manipulation z-20">
-                <div class="grid grid-cols-1 gap-2 opacity-50">
-                    <div class="w-3 h-8 bg-gray-300 rounded-sm"></div>
-                    <div class="w-3 h-8 bg-gray-300 rounded-sm"></div>
-                </div>
-            </button>
-
-        </div>
-    </div>
-
-    <script>
-        /**
-         * Phase 2: Vehicle Physics & Telemetry Binding
-         */
-
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // DOM Elements for UI Binding
-        const rpmNeedle = document.getElementById('rpmNeedle');
-        const mphNeedle = document.getElementById('mphNeedle');
-        const rpmText = document.getElementById('rpmText');
-        const mphText = document.getElementById('mphText');
-        const gearDisplay = document.getElementById('gearDisplay');
-        const btnGas = document.getElementById('btnGas');
-        const btnBrake = document.getElementById('btnBrake');
-
-        // Internal resolution mapping
-        canvas.width = 840;
-        canvas.height = 360;
-
-        // Input State
-        const inputs = { throttle: false, brake: false };
-
-        // Keyboard Event Listeners
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'ArrowUp' || e.code === 'KeyW') { inputs.throttle = true; btnGas.classList.add('active-state'); }
-            if (e.code === 'ArrowDown' || e.code === 'KeyS') { inputs.brake = true; btnBrake.classList.add('active-state'); }
-        });
-        window.addEventListener('keyup', (e) => {
-            if (e.code === 'ArrowUp' || e.code === 'KeyW') { inputs.throttle = false; btnGas.classList.remove('active-state'); }
-            if (e.code === 'ArrowDown' || e.code === 'KeyS') { inputs.brake = false; btnBrake.classList.remove('active-state'); }
-        });
-
-        // Touch/Mouse Event Listeners for Mobile UI
-        const addTouchSupport = (el, type) => {
-            el.addEventListener('mousedown', () => { inputs[type] = true; el.classList.add('active-state'); });
-            el.addEventListener('mouseup', () => { inputs[type] = false; el.classList.remove('active-state'); });
-            el.addEventListener('mouseleave', () => { inputs[type] = false; el.classList.remove('active-state'); });
-            el.addEventListener('touchstart', (e) => { e.preventDefault(); inputs[type] = true; el.classList.add('active-state'); });
-            el.addEventListener('touchend', (e) => { e.preventDefault(); inputs[type] = false; el.classList.remove('active-state'); });
-        };
-        addTouchSupport(btnGas, 'throttle');
-        addTouchSupport(btnBrake, 'brake');
-
-        class VehiclePhysics {
-            constructor() {
-                this.rpm = 1000;
-                this.idleRpm = 1000;
-                this.maxRpm = 8000;
-                
-                this.gear = 1;
-                // Multipliers dictating speed per gear
-                this.gearRatios = [0, 5, 12, 22, 35, 50]; 
-                this.maxGear = 5;
-
-                this.speed = 0;       // Correlates to MPH
-                this.velocity = 0;    // Canvas pixels per frame
-            }
-
-            update(inputs) {
-                // 1. Calculate RPM based on throttle
-                if (inputs.throttle) {
-                    this.rpm += 120; // Rev up
-                } else {
-                    this.rpm -= 80;  // Engine braking / coasting down
-                }
-
-                // Hard braking overrides engine braking
-                if (inputs.brake) {
-                    this.rpm -= 150;
-                    this.speed -= 1.5; 
-                }
-
-                // Clamp RPM
-                if (this.rpm > this.maxRpm) this.rpm = this.maxRpm;
-                if (this.rpm < this.idleRpm) this.rpm = this.idleRpm;
-
-                // 2. Auto-Transmission Logic
-                if (this.rpm > 7200 && this.gear < this.maxGear) {
-                    this.gear++;
-                    this.rpm = 4500; // Drop RPM on upshift
-                } else if (this.rpm < 3000 && this.gear > 1) {
-                    this.gear--;
-                    this.rpm = 5500; // Spike RPM on downshift
-                }
-
-                // 3. Calculate Speed from RPM and Gear (if not hard braking to a halt)
-                let targetSpeed = (this.rpm / this.maxRpm) * this.gearRatios[this.gear];
-                if (!inputs.brake) {
-                    // Ease current speed towards target speed for smoother acceleration
-                    this.speed += (targetSpeed - this.speed) * 0.1;
-                }
-                
-                if (this.speed < 0) this.speed = 0;
-
-                // 4. Map Speed to Canvas Velocity (Pixels per frame)
-                this.velocity = this.speed * 0.6; // Scale down for visual comfort
-            }
-        }
-
-        class GameEngine {
-            constructor() {
-                this.car = new VehiclePhysics();
-                this.roadOffset = 0;
-                this.mountainOffset = 0;
-                this.skyOffset = 0;
-            }
-
-            updateUI() {
-                // Update text displays
-                gearDisplay.innerText = this.car.gear;
-                mphText.innerText = Math.floor(this.car.speed);
-                rpmText.innerText = (this.car.rpm / 1000).toFixed(1);
-
-                // Map RPM (0 - 8000) to degrees (-135 to 135)
-                const rpmAngle = (this.car.rpm / 8000) * 270 - 135;
-                rpmNeedle.style.transform = `rotate(${rpmAngle}deg)`;
-
-                // Map Speed (0 - 160) to degrees (-135 to 135)
-                const maxDisplaySpeed = 160;
-                let speedAngle = (this.car.speed / maxDisplaySpeed) * 270 - 135;
-                if (speedAngle > 135) speedAngle = 135;
-                mphNeedle.style.transform = `rotate(${speedAngle}deg)`;
-            }
-
-            update() {
-                // Update Physics
-                this.car.update(inputs);
-                this.updateUI();
-
-                // Update Parallax
-                this.roadOffset += this.car.velocity; 
-                this.mountainOffset += this.car.velocity * 0.3;
-                this.skyOffset += this.car.velocity * 0.05;
-
-                // Loop Offsets
-                if (this.roadOffset > 100) this.roadOffset %= 100;
-                if (this.mountainOffset > canvas.width) this.mountainOffset %= canvas.width;
-                if (this.skyOffset > canvas.width) this.skyOffset %= canvas.width;
-            }
-
-            draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                // --- LAYER 1: SKY ---
-                ctx.fillStyle = '#4ca3dd';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                for (let i = 0; i < 3; i++) {
-                    let cloudX = (i * 300) - this.skyOffset;
-                    if (cloudX < -200) cloudX += canvas.width + 200;
-                    ctx.fillRect(cloudX, 40, 120, 30);
-                    ctx.fillRect(cloudX + 20, 20, 80, 20);
-                }
-
-                // --- LAYER 2: MOUNTAINS ---
-                ctx.fillStyle = '#2c3e50';
-                for (let j = 0; j < 2; j++) {
-                    const baseX = (j * canvas.width) - this.mountainOffset;
-                    ctx.beginPath();
-                    ctx.moveTo(baseX, 220);
-                    ctx.lineTo(baseX + 150, 80);
-                    ctx.lineTo(baseX + 300, 220);
-                    ctx.lineTo(baseX + 500, 50);
-                    ctx.lineTo(baseX + 700, 220);
-                    ctx.lineTo(baseX + canvas.width, 220);
-                    ctx.fill();
-                }
-
-                // --- LAYER 3: ROAD ---
-                const horizonY = 220;
-                const roadHeight = canvas.height - horizonY;
-                ctx.fillStyle = '#333333';
-                ctx.fillRect(0, horizonY, canvas.width, roadHeight);
-                ctx.fillStyle = '#555555';
-                ctx.fillRect(0, horizonY, canvas.width, 5);
-
-                ctx.fillStyle = '#ffffff';
-                ctx.lineWidth = 4;
-                const laneY = horizonY + (roadHeight / 2) - 2;
-                for (let i = 0; i < canvas.width + 100; i += 100) {
-                    const dashX = i - this.roadOffset;
-                    ctx.fillRect(dashX, laneY, 50, 4);
-                }
-
-                // --- LAYER 4: CAR ---
-                const carX = 100;
-                const carY = horizonY + 40;
-                const bobbing = this.car.velocity > 0 ? Math.sin(Date.now() / 50) * (this.car.velocity * 0.1) : 0;
-
-                ctx.fillStyle = '#f87171'; 
-                ctx.fillRect(carX, carY + bobbing, 120, 35);
-                ctx.fillStyle = '#1f2937'; 
-                ctx.fillRect(carX + 30, carY - 20 + bobbing, 60, 20);
-                
-                ctx.fillStyle = '#000000';
-                ctx.beginPath();
-                ctx.arc(carX + 25, carY + 35 + bobbing, 12, 0, Math.PI * 2);
-                ctx.arc(carX + 95, carY + 35 + bobbing, 12, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.fillStyle = '#cbd5e1';
-                ctx.beginPath();
-                const spin = this.roadOffset * 0.5;
-                ctx.arc(carX + 25 + Math.cos(spin)*4, carY + 35 + bobbing + Math.sin(spin)*4, 4, 0, Math.PI * 2);
-                ctx.arc(carX + 95 + Math.cos(spin)*4, carY + 35 + bobbing + Math.sin(spin)*4, 4, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            loop() {
-                this.update();
-                this.draw();
-                requestAnimationFrame(() => this.loop());
-            }
-        }
-
-        const game = new GameEngine();
-        game.loop();
-    </script>
-</body>
-</html>
+                    <div class="absolute text-[10px] sm:text-xs text-gray-400 font-bold top-4
