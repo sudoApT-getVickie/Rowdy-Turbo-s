@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2D Endless Driving Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #111827; /* Tailwind gray-900 */
+            color: white;
+            overflow: hidden; /* Prevent scrolling when using arrow keys */
+            touch-action: none; /* Prevent mobile gestures */
+        }
+        /* Keep canvas crisp for future pixel art */
+        canvas {
+            image-rendering: pixelated; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Game UI Wrapper -->
+    <div class="relative w-full max-w-4xl aspect-[21/9] bg-black rounded-lg overflow-hidden border-2 border-gray-700">
+        
+        <!-- The Game World -->
+        <canvas id="gameCanvas" class="block w-full h-full"></canvas>
+
+        <!-- Placeholder for Phase 2: HTML/CSS Dashboard Overlay -->
+        <div id="dashboardOverlay" class="absolute bottom-0 w-full h-24 bg-gray-900/90 border-t border-gray-600 flex justify-between items-center px-8 hidden">
+            <!-- Dials and pedals will be injected here later -->
+        </div>
+
+        <!-- Temporary Phase 1 Debug Info -->
+        <div class="absolute top-4 left-4 font-mono text-sm bg-black/70 p-2 rounded text-green-400">
+            <p>Velocity: <span id="debugSpeed">0</span> px/frame</p>
+            <p>Controls: [W] or [↑] to Accelerate, [S] or [↓] to Brake</p>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Phase 1: Core Engine & Parallax Rendering
+         * Architecture uses ES6 Classes for modularity, preparing for complex physics state machines.
+         */
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const debugSpeed = document.getElementById('debugSpeed');
+
+        // Internal resolution (scales up via CSS)
+        canvas.width = 840;
+        canvas.height = 360;
+
+        // Input State
+        const keys = {
+            up: false,
+            down: false
+        };
+
+        // Listeners
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'ArrowUp' || e.code === 'KeyW') keys.up = true;
+            if (e.code === 'ArrowDown' || e.code === 'KeyS') keys.down = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowUp' || e.code === 'KeyW') keys.up = false;
+            if (e.code === 'ArrowDown' || e.code === 'KeyS') keys.down = false;
+        });
+
+        class GameEngine {
+            constructor() {
+                // Raw Physics State (To be expanded in Phase 2)
+                this.velocity = 0;
+                this.maxVelocity = 25;
+                this.acceleration = 0.2;
+                this.friction = 0.05;
+                this.braking = 0.4;
+
+                // Parallax Layer Offsets
+                this.roadOffset = 0;
+                this.mountainOffset = 0;
+                this.skyOffset = 0;
+            }
+
+            update() {
+                // 1. Calculate Velocity based on inputs
+                if (keys.up) {
+                    this.velocity += this.acceleration;
+                } else if (keys.down) {
+                    this.velocity -= this.braking;
+                } else {
+                    // Coasting friction
+                    if (this.velocity > 0) this.velocity -= this.friction;
+                    if (this.velocity < 0) this.velocity = 0;
+                }
+
+                // Clamp velocity
+                if (this.velocity > this.maxVelocity) this.velocity = this.maxVelocity;
+                if (this.velocity < 0) this.velocity = 0;
+
+                // Update debug UI
+                debugSpeed.innerText = this.velocity.toFixed(1);
+
+                // 2. Update Parallax Offsets
+                // Different layers move at different fractions of the car's velocity
+                this.roadOffset += this.velocity; 
+                this.mountainOffset += this.velocity * 0.3; // Mountains move slower (further away)
+                this.skyOffset += this.velocity * 0.05;     // Sky moves very slowly
+
+                // Reset offsets to prevent floating point overflow over long distances
+                if (this.roadOffset > 100) this.roadOffset %= 100;
+                if (this.mountainOffset > canvas.width) this.mountainOffset %= canvas.width;
+                if (this.skyOffset > canvas.width) this.skyOffset %= canvas.width;
+            }
+
+            draw() {
+                // Clear Canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // --- LAYER 1: SKY ---
+                ctx.fillStyle = '#4ca3dd'; // Daytime blue
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Procedural clouds
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                for (let i = 0; i < 3; i++) {
+                    let cloudX = (i * 300) - this.skyOffset;
+                    // Loop clouds to the other side
+                    if (cloudX < -200) cloudX += canvas.width + 200;
+                    ctx.fillRect(cloudX, 40, 120, 30);
+                    ctx.fillRect(cloudX + 20, 20, 80, 20);
+                }
+
+                // --- LAYER 2: MOUNTAINS ---
+                ctx.fillStyle = '#2c3e50';
+                // Draw two sets of mountains to ensure seamless scrolling
+                for (let j = 0; j < 2; j++) {
+                    const baseX = (j * canvas.width) - this.mountainOffset;
+                    ctx.beginPath();
+                    ctx.moveTo(baseX, 220); // Road horizon line
+                    ctx.lineTo(baseX + 150, 80); // Peak 1
+                    ctx.lineTo(baseX + 300, 220);
+                    ctx.lineTo(baseX + 500, 50); // Peak 2
+                    ctx.lineTo(baseX + 700, 220);
+                    ctx.lineTo(baseX + canvas.width, 220);
+                    ctx.fill();
+                }
+
+                // --- LAYER 3: THE ROAD ---
+                const horizonY = 220;
+                const roadHeight = canvas.height - horizonY;
+                
+                // Base Asphalt
+                ctx.fillStyle = '#333333';
+                ctx.fillRect(0, horizonY, canvas.width, roadHeight);
+
+                // Road Horizon Trim
+                ctx.fillStyle = '#555555';
+                ctx.fillRect(0, horizonY, canvas.width, 5);
+
+                // Dashed Lane Markings
+                ctx.fillStyle = '#ffffff';
+                ctx.lineWidth = 4;
+                const laneY = horizonY + (roadHeight / 2) - 2;
+                
+                for (let i = 0; i < canvas.width + 100; i += 100) {
+                    const dashX = i - this.roadOffset;
+                    ctx.fillRect(dashX, laneY, 50, 4);
+                }
+
+                // --- LAYER 4: PLAYER CAR (Placeholder) ---
+                // Simulating a side-scrolling perspective. The car stays mostly static on the X-axis.
+                const carX = 100;
+                const carY = horizonY + 40;
+                
+                // Add a slight vertical bobbing effect based on speed
+                const bobbing = this.velocity > 0 ? Math.sin(Date.now() / 50) * (this.velocity * 0.1) : 0;
+
+                ctx.fillStyle = '#f87171'; // Tailwind red-400
+                // Car Body
+                ctx.fillRect(carX, carY + bobbing, 120, 35);
+                // Car Cabin
+                ctx.fillStyle = '#1f2937'; // Dark glass
+                ctx.fillRect(carX + 30, carY - 20 + bobbing, 60, 20);
+                
+                // Wheels
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.arc(carX + 25, carY + 35 + bobbing, 12, 0, Math.PI * 2);
+                ctx.arc(carX + 95, carY + 35 + bobbing, 12, 0, Math.PI * 2);
+                ctx.fill();
+                // Wheel rims (spinning effect)
+                ctx.fillStyle = '#cbd5e1';
+                ctx.beginPath();
+                // Rotate rim dots slightly based on road offset to simulate rotation
+                const spin = this.roadOffset * 0.5;
+                ctx.arc(carX + 25 + Math.cos(spin)*4, carY + 35 + bobbing + Math.sin(spin)*4, 4, 0, Math.PI * 2);
+                ctx.arc(carX + 95 + Math.cos(spin)*4, carY + 35 + bobbing + Math.sin(spin)*4, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            loop() {
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.loop());
+            }
+        }
+
+        // Initialize and start the engine
+        const game = new GameEngine();
+        game.loop();
+
+    </script>
+</body>
+</html>
