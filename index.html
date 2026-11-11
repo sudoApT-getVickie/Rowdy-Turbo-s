@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D Endless Driving - Phase 3</title>
+    <title>2D Endless Driving - Phase 3.1 (Patched)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -13,10 +13,7 @@
             touch-action: none;
             user-select: none;
         }
-        canvas {
-            image-rendering: pixelated; 
-        }
-        /* Dashboard Dial Styles */
+        canvas { image-rendering: pixelated; }
         .dial-bg {
             background: radial-gradient(circle, #1f2937 0%, #030712 100%);
             border: 4px solid #374151;
@@ -26,7 +23,6 @@
             transform-origin: bottom center;
             transition: transform 0.05s linear;
         }
-        /* Mobile Pedal Styles */
         .pedal {
             background: linear-gradient(180deg, #4b5563 0%, #1f2937 100%);
             box-shadow: inset 0 2px 5px rgba(255,255,255,0.2), 0 5px 10px rgba(0,0,0,0.5);
@@ -39,30 +35,27 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-0 sm:p-4 bg-gray-900">
 
-    <!-- Game Viewport Wrapper -->
     <div class="relative w-full max-w-5xl aspect-[21/9] sm:aspect-[16/7] bg-black sm:rounded-lg overflow-hidden border-0 sm:border-2 border-gray-700 shadow-2xl flex flex-col justify-between">
         
-        <!-- Fuel Bar UI (NEW) -->
+        <!-- Fuel Bar UI -->
         <div class="absolute top-0 left-0 w-full h-3 bg-gray-800 z-20 border-b border-gray-700">
             <div id="fuelBar" class="h-full bg-green-500 transition-all duration-75 ease-linear" style="width: 100%;"></div>
         </div>
 
-        <!-- The Game World -->
         <canvas id="gameCanvas" class="block w-full h-full absolute top-0 left-0 z-0"></canvas>
 
-        <!-- Game Over Modal (NEW) -->
+        <!-- Game Over Modal -->
         <div id="gameOverModal" class="absolute inset-0 bg-black/80 z-30 hidden flex-col items-center justify-center backdrop-blur-sm">
             <h1 class="text-4xl sm:text-6xl text-red-500 font-black mb-2 tracking-widest drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]">OUT OF GAS</h1>
-            <p class="text-gray-300 mb-8 font-mono">Distance traveled: <span id="finalScore" class="text-white font-bold">0</span>m</p>
+            <p class="text-gray-300 mb-8 font-mono">Distance: <span id="finalScore" class="text-white font-bold">0</span>m</p>
             <button id="btnRestart" class="px-8 py-3 bg-transparent border-2 border-red-500 text-red-400 hover:bg-red-500 hover:text-black font-bold uppercase rounded transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)]">
                 Restart Engine
             </button>
         </div>
 
-        <!-- Phase 2 Dashboard UI Overlay -->
+        <!-- Dashboard UI Overlay -->
         <div id="dashboardOverlay" class="relative z-10 w-full h-32 sm:h-40 mt-auto bg-gradient-to-t from-black via-gray-900/90 to-transparent flex justify-between items-end px-4 sm:px-12 pb-2 sm:pb-6 pointer-events-none">
             
-            <!-- Left: Brake Pedal -->
             <button id="btnBrake" class="pedal pointer-events-auto w-16 h-20 sm:w-20 sm:h-28 rounded-md flex items-center justify-center border border-gray-500 cursor-pointer touch-manipulation z-20">
                 <div class="grid grid-cols-2 gap-1 opacity-50">
                     <div class="w-2 h-2 bg-gray-300 rounded-full"></div><div class="w-2 h-2 bg-gray-300 rounded-full"></div>
@@ -70,8 +63,256 @@
                 </div>
             </button>
 
-            <!-- Center: Telemetry Dials -->
             <div class="flex space-x-2 sm:space-x-8 items-end pb-2 pointer-events-auto">
-                <!-- Tachometer (RPM) -->
                 <div class="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full dial-bg flex items-center justify-center">
-                    <div class="absolute text-[10px] sm:text-xs text-gray-400 font-bold top-4
+                    <div class="absolute text-[10px] sm:text-xs text-gray-400 font-bold top-4 uppercase tracking-widest">RPM</div>
+                    <div id="rpmText" class="absolute bottom-4 text-xs sm:text-sm font-mono text-red-500 font-bold">1.0</div>
+                    <div id="rpmNeedle" class="needle absolute w-1 h-10 sm:h-14 bg-red-600 bottom-1/2 rounded-t-full shadow-[0_0_5px_rgba(220,38,38,0.8)]" style="transform: rotate(-135deg);"></div>
+                </div>
+
+                <div class="flex flex-col items-center justify-end h-full pb-4 space-y-2">
+                    <div class="bg-gray-800 border border-gray-600 px-3 py-1 rounded shadow-inner text-center">
+                        <div class="text-[8px] sm:text-[10px] text-gray-400 uppercase tracking-widest">Distance</div>
+                        <div id="distanceDisplay" class="text-sm sm:text-lg font-bold text-white font-mono">0m</div>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-600 px-3 py-1 rounded shadow-inner text-center">
+                        <div class="text-[8px] sm:text-[10px] text-gray-400 uppercase tracking-widest">Gear</div>
+                        <div id="gearDisplay" class="text-xl sm:text-2xl font-black text-cyan-400 font-mono">1</div>
+                    </div>
+                </div>
+
+                <div class="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full dial-bg flex items-center justify-center">
+                    <div class="absolute text-[10px] sm:text-xs text-gray-400 font-bold top-4 uppercase tracking-widest">MPH</div>
+                    <div id="mphText" class="absolute bottom-4 text-xs sm:text-sm font-mono text-white font-bold">0</div>
+                    <div id="mphNeedle" class="needle absolute w-1 h-10 sm:h-14 bg-white bottom-1/2 rounded-t-full shadow-[0_0_5px_rgba(255,255,255,0.8)]" style="transform: rotate(-135deg);"></div>
+                </div>
+            </div>
+
+            <button id="btnGas" class="pedal pointer-events-auto w-12 h-24 sm:w-16 sm:h-32 rounded-md flex flex-col items-center justify-center border border-gray-500 cursor-pointer touch-manipulation z-20">
+                <div class="grid grid-cols-1 gap-2 opacity-50">
+                    <div class="w-3 h-8 bg-gray-300 rounded-sm"></div>
+                    <div class="w-3 h-8 bg-gray-300 rounded-sm"></div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 840;
+        canvas.height = 360;
+
+        // Defensive DOM Element Fetching
+        const getEl = (id) => document.getElementById(id);
+        const elements = {
+            rpmNeedle: getEl('rpmNeedle'),
+            mphNeedle: getEl('mphNeedle'),
+            rpmText: getEl('rpmText'),
+            mphText: getEl('mphText'),
+            gearDisplay: getEl('gearDisplay'),
+            distanceDisplay: getEl('distanceDisplay'),
+            fuelBar: getEl('fuelBar'),
+            btnGas: getEl('btnGas'),
+            btnBrake: getEl('btnBrake'),
+            gameOverModal: getEl('gameOverModal'),
+            finalScore: getEl('finalScore'),
+            btnRestart: getEl('btnRestart')
+        };
+
+        const inputs = { throttle: false, brake: false };
+
+        window.addEventListener('keydown', (e) => {
+            if ((e.code === 'ArrowUp' || e.code === 'KeyW')) { inputs.throttle = true; if(elements.btnGas) elements.btnGas.classList.add('active-state'); }
+            if ((e.code === 'ArrowDown' || e.code === 'KeyS')) { inputs.brake = true; if(elements.btnBrake) elements.btnBrake.classList.add('active-state'); }
+        });
+        window.addEventListener('keyup', (e) => {
+            if ((e.code === 'ArrowUp' || e.code === 'KeyW')) { inputs.throttle = false; if(elements.btnGas) elements.btnGas.classList.remove('active-state'); }
+            if ((e.code === 'ArrowDown' || e.code === 'KeyS')) { inputs.brake = false; if(elements.btnBrake) elements.btnBrake.classList.remove('active-state'); }
+        });
+
+        // Robust Touch Listener Assignment
+        const addTouchSupport = (el, type) => {
+            if (!el) return; // Fail gracefully if HTML is missing
+            const start = (e) => { if(e.type==='touchstart') e.preventDefault(); inputs[type] = true; el.classList.add('active-state'); };
+            const end = (e) => { if(e.type==='touchend') e.preventDefault(); inputs[type] = false; el.classList.remove('active-state'); };
+            el.addEventListener('mousedown', start);
+            el.addEventListener('touchstart', start);
+            el.addEventListener('mouseup', end);
+            el.addEventListener('mouseleave', end);
+            el.addEventListener('touchend', end);
+        };
+        addTouchSupport(elements.btnGas, 'throttle');
+        addTouchSupport(elements.btnBrake, 'brake');
+
+        class VehiclePhysics {
+            constructor() { this.reset(); }
+            reset() {
+                this.rpm = 1000;
+                this.idleRpm = 1000;
+                this.maxRpm = 8000;
+                this.gear = 1;
+                this.gearRatios = [0, 5, 12, 22, 35, 50]; 
+                this.maxGear = 5;
+                this.speed = 0;       
+                this.velocity = 0;
+                this.maxFuel = 100;
+                this.fuel = this.maxFuel;
+            }
+            update(inputs) {
+                let effectiveThrottle = inputs.throttle && this.fuel > 0;
+                if (effectiveThrottle) this.rpm += 120; 
+                else this.rpm -= 80;  
+                
+                if (inputs.brake) { this.rpm -= 150; this.speed -= 1.5; }
+                if (this.rpm > this.maxRpm) this.rpm = this.maxRpm;
+                if (this.rpm < this.idleRpm) this.rpm = this.idleRpm;
+
+                if (this.rpm > 7200 && this.gear < this.maxGear) { this.gear++; this.rpm = 4500; }
+                else if (this.rpm < 3000 && this.gear > 1) { this.gear--; this.rpm = 5500; }
+
+                let targetSpeed = (this.rpm / this.maxRpm) * this.gearRatios[this.gear];
+                if (this.fuel <= 0) targetSpeed = 0;
+                if (!inputs.brake) this.speed += (targetSpeed - this.speed) * (this.fuel > 0 ? 0.1 : 0.02);
+                
+                if (this.speed < 0.1) this.speed = 0;
+                this.velocity = this.speed * 0.6;
+
+                if (this.fuel > 0 && this.speed > 0) {
+                    this.fuel -= (0.02 + ((this.rpm / this.maxRpm) * 0.05));
+                    if (this.fuel < 0) this.fuel = 0;
+                }
+            }
+        }
+
+        class GameEngine {
+            constructor() {
+                this.car = new VehiclePhysics();
+                this.carBounds = { x: 100, y: 260, w: 120, h: 35 };
+                this.resetEnvironment();
+            }
+            resetEnvironment() {
+                this.roadOffset = 0; this.mountainOffset = 0; this.skyOffset = 0;
+                this.distance = 0; this.fuelCans = []; this.isGameOver = false;
+                this.car.reset();
+            }
+            updateUI() {
+                if (elements.gearDisplay) elements.gearDisplay.innerText = this.car.gear;
+                if (elements.mphText) elements.mphText.innerText = Math.floor(this.car.speed);
+                if (elements.rpmText) elements.rpmText.innerText = (this.car.rpm / 1000).toFixed(1);
+                if (elements.distanceDisplay) elements.distanceDisplay.innerText = Math.floor(this.distance) + 'm';
+
+                if (elements.rpmNeedle) elements.rpmNeedle.style.transform = `rotate(${(this.car.rpm / 8000) * 270 - 135}deg)`;
+                if (elements.mphNeedle) elements.mphNeedle.style.transform = `rotate(${Math.min(135, (this.car.speed / 160) * 270 - 135)}deg)`;
+
+                if (elements.fuelBar) {
+                    const fuelPercent = (this.car.fuel / this.car.maxFuel) * 100;
+                    elements.fuelBar.style.width = `${fuelPercent}%`;
+                    elements.fuelBar.className = `h-full transition-all duration-75 ease-linear ${fuelPercent < 20 ? 'bg-red-500' : fuelPercent < 50 ? 'bg-yellow-500' : 'bg-green-500'}`;
+                }
+
+                if (this.car.fuel <= 0 && this.car.speed === 0 && !this.isGameOver) {
+                    this.isGameOver = true;
+                    if (elements.finalScore) elements.finalScore.innerText = Math.floor(this.distance);
+                    if (elements.gameOverModal) {
+                        elements.gameOverModal.classList.remove('hidden');
+                        elements.gameOverModal.classList.add('flex');
+                    }
+                }
+            }
+            update() {
+                if (!this.isGameOver) {
+                    this.car.update(inputs);
+                    this.distance += this.car.velocity * 0.01;
+                    
+                    this.roadOffset = (this.roadOffset + this.car.velocity) % 100; 
+                    this.mountainOffset = (this.mountainOffset + this.car.velocity * 0.3) % canvas.width;
+                    this.skyOffset = (this.skyOffset + this.car.velocity * 0.05) % canvas.width;
+
+                    if (this.car.velocity > 0 && Math.random() < 0.01) {
+                        if (this.fuelCans.length === 0 || this.fuelCans[this.fuelCans.length - 1].x < canvas.width - 300) {
+                            this.fuelCans.push({ x: canvas.width + 50, y: 250, w: 20, h: 30, collected: false });
+                        }
+                    }
+                }
+                this.updateUI();
+            }
+            draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#4ca3dd'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                for (let i = 0; i < 3; i++) {
+                    let cloudX = (i * 300) - this.skyOffset;
+                    if (cloudX < -200) cloudX += canvas.width + 200;
+                    ctx.fillRect(cloudX, 40, 120, 30); ctx.fillRect(cloudX + 20, 20, 80, 20);
+                }
+
+                ctx.fillStyle = '#2c3e50';
+                for (let j = 0; j < 2; j++) {
+                    const baseX = (j * canvas.width) - this.mountainOffset;
+                    ctx.beginPath(); ctx.moveTo(baseX, 220); ctx.lineTo(baseX + 150, 80);
+                    ctx.lineTo(baseX + 300, 220); ctx.lineTo(baseX + 500, 50);
+                    ctx.lineTo(baseX + 700, 220); ctx.lineTo(baseX + canvas.width, 220); ctx.fill();
+                }
+
+                const horizonY = 220, roadHeight = canvas.height - horizonY;
+                ctx.fillStyle = '#333333'; ctx.fillRect(0, horizonY, canvas.width, roadHeight);
+                ctx.fillStyle = '#555555'; ctx.fillRect(0, horizonY, canvas.width, 5);
+
+                ctx.fillStyle = '#ffffff'; ctx.lineWidth = 4;
+                const laneY = horizonY + (roadHeight / 2) - 2;
+                for (let i = 0; i < canvas.width + 100; i += 100) ctx.fillRect(i - this.roadOffset, laneY, 50, 4);
+
+                for (let i = this.fuelCans.length - 1; i >= 0; i--) {
+                    let can = this.fuelCans[i];
+                    if (!this.isGameOver) can.x -= this.car.velocity;
+
+                    if (!can.collected && can.x < this.carBounds.x + this.carBounds.w && can.x + can.w > this.carBounds.x &&
+                        can.y < this.carBounds.y + this.carBounds.h && can.y + can.h > this.carBounds.y) {
+                        can.collected = true;
+                        this.car.fuel = Math.min(this.car.maxFuel, this.car.fuel + 30);
+                    }
+                    if (can.collected || can.x < -50) this.fuelCans.splice(i, 1);
+                    else {
+                        ctx.fillStyle = '#eab308'; ctx.fillRect(can.x, can.y, can.w, can.h);
+                        ctx.fillStyle = '#ef4444'; ctx.fillRect(can.x + 2, can.y - 4, 8, 4);
+                    }
+                }
+
+                const bobbing = this.car.velocity > 0 ? Math.sin(Date.now() / 50) * (this.car.velocity * 0.1) : 0;
+                ctx.fillStyle = '#f87171'; ctx.fillRect(this.carBounds.x, this.carBounds.y + bobbing, this.carBounds.w, this.carBounds.h);
+                ctx.fillStyle = '#1f2937'; ctx.fillRect(this.carBounds.x + 30, this.carBounds.y - 20 + bobbing, 60, 20);
+                
+                ctx.fillStyle = '#000000'; ctx.beginPath();
+                ctx.arc(this.carBounds.x + 25, this.carBounds.y + 35 + bobbing, 12, 0, Math.PI * 2);
+                ctx.arc(this.carBounds.x + 95, this.carBounds.y + 35 + bobbing, 12, 0, Math.PI * 2); ctx.fill();
+                
+                ctx.fillStyle = '#cbd5e1'; ctx.beginPath();
+                const spin = this.roadOffset * 0.5;
+                ctx.arc(this.carBounds.x + 25 + Math.cos(spin)*4, this.carBounds.y + 35 + bobbing + Math.sin(spin)*4, 4, 0, Math.PI * 2);
+                ctx.arc(this.carBounds.x + 95 + Math.cos(spin)*4, this.carBounds.y + 35 + bobbing + Math.sin(spin)*4, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            loop() {
+                this.update(); this.draw();
+                requestAnimationFrame(() => this.loop());
+            }
+        }
+
+        const game = new GameEngine();
+        game.loop();
+
+        if (elements.btnRestart) {
+            elements.btnRestart.addEventListener('click', () => {
+                game.resetEnvironment();
+                if(elements.gameOverModal) {
+                    elements.gameOverModal.classList.add('hidden');
+                    elements.gameOverModal.classList.remove('flex');
+                }
+                inputs.throttle = false; inputs.brake = false;
+            });
+        }
+    </script>
+</body>
+</html>
