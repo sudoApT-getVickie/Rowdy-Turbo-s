@@ -17,8 +17,8 @@ export default function Desktop() {
               All systems nominal.
             </p>
             <p className="text-lg leading-tight">
-              > Select an executable from the Game Hub to initiate a simulation.<br/>
-              > Initialize the media player for background audio.
+              &gt; Select an executable from the Game Hub to initiate a simulation.<br/>
+              &gt; Initialize the media player for background audio.
             </p>
           </div>
         </WindowFrame>
@@ -26,7 +26,6 @@ export default function Desktop() {
         {/* Section 2: Media Player Window */}
         <WindowFrame title="MEDIA_PLAYER.EXE" width="w-full">
            <div className="bg-black shadow-win-inset p-1">
-             {/* Replace this src URL with your preferred Spotify playlist or YouTube embed */}
              <iframe 
                 src="https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYpdgIwl22?utm_source=generator&theme=0" 
                 width="100%" 
@@ -49,7 +48,6 @@ export default function Desktop() {
             
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-6 text-center">
               
-              {/* Game Icon 1: Car Game */}
               <div className="flex flex-col items-center gap-2 p-2 cursor-pointer border border-transparent hover:border-dotted hover:border-win-gray-dark active:bg-win-blue active:text-white transition-colors">
                 <div className="w-12 h-12 bg-red-500 shadow-win-outset flex items-center justify-center text-3xl select-none">
                   🚗
@@ -57,15 +55,12 @@ export default function Desktop() {
                 <span className="text-sm bg-transparent px-1">Rowdy_Turbo.exe</span>
               </div>
 
-              {/* Game Icon 2: Snake Game */}
               <div className="flex flex-col items-center gap-2 p-2 cursor-pointer border border-transparent hover:border-dotted hover:border-win-gray-dark active:bg-win-blue active:text-white transition-colors">
                 <div className="w-12 h-12 bg-green-500 shadow-win-outset flex items-center justify-center text-3xl select-none">
                   🐍
                 </div>
                 <span className="text-sm bg-transparent px-1">Cyber_Snake.exe</span>
               </div>
-
-              {/* Add more interactive icons here (e.g., Patana.exe, QejaYetu.exe) */}
               
             </div>
           </div>
