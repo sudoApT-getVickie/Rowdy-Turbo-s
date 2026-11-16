@@ -15,6 +15,7 @@ const config: Config = {
       },
       fontFamily: {
         pixel: ['"VT323"', 'monospace'],
+        starborn: ['var(--font-starborn)', 'sans-serif'], // Added custom local font
       },
       boxShadow: {
         'win-outset': 'inset -1px -1px #0a0a0a, inset 1px 1px #ffffff, inset -2px -2px #808080, inset 2px 2px #dfdfdf',
