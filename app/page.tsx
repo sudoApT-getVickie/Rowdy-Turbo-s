@@ -5,11 +5,12 @@ export default function Desktop() {
     <main className="h-screen w-full overflow-y-auto snap-y snap-mandatory flex flex-col items-center scroll-smooth">
       
       {/* Section 1: Hero / Welcome Window */}
-      <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center">
         <WindowFrame title="WELCOME.TXT" width="w-full max-w-3xl">
           <div className="bg-white p-4 shadow-win-inset text-black font-pixel">
-            <h1 className="text-3xl font-bold mb-2">muthomi-artfolio</h1>
-            <p className="text-xl mb-4 text-win-blue">Innovation Engineer & Web Developer</p>
+            {/* Applied the new font-starborn class here */}
+            <h1 className="text-4xl font-starborn mb-4 mt-2">Sudo-ApT</h1>
+            
+            <p className="text-xl mb-4 text-win-blue">Booting up $ystems...</p>
             <p className="text-lg leading-tight mb-4">
               System booted successfully from Nairobi servers.<br/>
               All systems nominal.
