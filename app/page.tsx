@@ -2,17 +2,27 @@ import WindowFrame from '@/components/WindowFrame';
 
 export default function Desktop() {
   return (
-    <main className="h-screen w-full overflow-y-auto snap-y snap-mandatory flex flex-col items-center scroll-smooth">
+    <main className="h-screen w-full overflow-y-auto snap-y snap-mandatory flex flex-col items-center scroll-smooth relative z-0">
       
+      {/* HTML5 Video Background */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="fixed top-0 left-0 w-full h-full object-cover -z-10 pointer-events-none"
+      >
+        <source src="/Rowdy-Turbo-s/hero.mp4" type="video/mp4" />
+      </video>
+
       {/* Section 1: Hero / Welcome Window */}
       <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center">
         <WindowFrame title="WELCOME.TXT" width="w-full max-w-3xl">
           <div className="bg-white p-4 shadow-win-inset text-black font-pixel">
-            <h1 className="text-4xl font-starborn mb-4 mt-2">SudoApT-artfolio</h1>
+            <h1 className="text-4xl font-starborn mb-4 mt-2 uppercase">SudoApt-ARTfolio</h1>
             <p className="text-xl mb-4 text-win-blue">Requiem For Your Dream</p>
             <p className="text-lg leading-tight mb-4">
-              Do Whatever you want to do in the Morning, the thing that makes your heart pound out of joy <br/>
-              and Keeps your mind at ea$e.
+              Do Whatever you want to do in the Morning, the thing that makes your heart pound out of joy and Keeps your mind at ea$e.
             </p>
             <p className="text-lg leading-tight">
               &gt; Scroll down to initialize the media module.<br/>
