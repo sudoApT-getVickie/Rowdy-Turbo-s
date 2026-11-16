@@ -9,10 +9,10 @@ export default function Desktop() {
         <WindowFrame title="WELCOME.TXT" width="w-full max-w-3xl">
           <div className="bg-white p-4 shadow-win-inset text-black font-pixel">
             <h1 className="text-4xl font-starborn mb-4 mt-2">SudoApT-artfolio</h1>
-            <p className="text-xl mb-4 text-win-blue">Innovation Engineer & Web Developer</p>
+            <p className="text-xl mb-4 text-win-blue">Requiem For Your Dream</p>
             <p className="text-lg leading-tight mb-4">
-              System booted successfully from Nairobi servers.<br/>
-              All systems nominal.
+              Do Whatever you want to do in the Morning, the thing that makes your heart pound out of joy <br/>
+              and Keeps your mind at ea$e.
             </p>
             <p className="text-lg leading-tight">
               &gt; Scroll down to initialize the media module.<br/>
