@@ -2,13 +2,11 @@ import WindowFrame from '@/components/WindowFrame';
 
 export default function Desktop() {
   return (
-    <main className="min-h-screen w-full p-4 sm:p-8 flex flex-col lg:flex-row gap-6 items-start justify-center relative z-10">
+    <main className="h-screen w-full overflow-y-auto snap-y snap-mandatory flex flex-col items-center scroll-smooth">
       
-      {/* Left Column: Hero & Media */}
-      <div className="flex flex-col gap-6 w-full lg:w-1/2 max-w-xl">
-        
-        {/* Section 1: Hero / Welcome Window */}
-        <WindowFrame title="WELCOME.TXT" width="w-full">
+      {/* Section 1: Hero / Welcome Window */}
+      <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center">
+        <WindowFrame title="WELCOME.TXT" width="w-full max-w-3xl">
           <div className="bg-white p-4 shadow-win-inset text-black font-pixel">
             <h1 className="text-3xl font-bold mb-2">muthomi-artfolio</h1>
             <p className="text-xl mb-4 text-win-blue">Innovation Engineer & Web Developer</p>
@@ -17,19 +15,21 @@ export default function Desktop() {
               All systems nominal.
             </p>
             <p className="text-lg leading-tight">
-              &gt; Select an executable from the Game Hub to initiate a simulation.<br/>
-              &gt; Initialize the media player for background audio.
+              &gt; Scroll down to initialize the media module.<br/>
+              &gt; Access the Game Hub to initiate a simulation.
             </p>
           </div>
         </WindowFrame>
+      </section>
 
-        {/* Section 2: Media Player Window */}
-        <WindowFrame title="MEDIA_PLAYER.EXE" width="w-full">
+      {/* Section 2: Media Player Window */}
+      <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center">
+        <WindowFrame title="MEDIA_PLAYER.EXE" width="w-full max-w-3xl">
            <div className="bg-black shadow-win-inset p-1">
              <iframe 
-                src="https://open.spotify.com/embed/playlist/37i9dQZF1DX4WYpdgIwl22?utm_source=generator&theme=0" 
+                src="https://open.spotify.com/embed/playlist/0vvXsWCC9xrXsKd4FyS8kM?utm_source=generator&theme=0" 
                 width="100%" 
-                height="152" 
+                height="352" 
                 frameBorder="0" 
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
                 loading="lazy"
@@ -37,26 +37,25 @@ export default function Desktop() {
              </iframe>
            </div>
         </WindowFrame>
+      </section>
 
-      </div>
-
-      {/* Right Column: Game Hub */}
-      <div className="flex flex-col gap-6 w-full lg:w-1/2 max-w-xl">
-        <WindowFrame title="GAMES_HUB.EXE" width="w-full">
+      {/* Section 3: Game Hub */}
+      <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center">
+        <WindowFrame title="GAMES_HUB.EXE" width="w-full max-w-3xl">
           <div className="bg-white shadow-win-inset p-6 h-full min-h-[350px]">
             <p className="text-win-gray-dark mb-4 border-b border-win-gray-light pb-2">C:\Users\Admin\Games\&gt;</p>
             
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-6 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
               
               <div className="flex flex-col items-center gap-2 p-2 cursor-pointer border border-transparent hover:border-dotted hover:border-win-gray-dark active:bg-win-blue active:text-white transition-colors">
-                <div className="w-12 h-12 bg-red-500 shadow-win-outset flex items-center justify-center text-3xl select-none">
+                <div className="w-16 h-16 bg-red-500 shadow-win-outset flex items-center justify-center text-4xl select-none">
                   🚗
                 </div>
                 <span className="text-sm bg-transparent px-1">Rowdy_Turbo.exe</span>
               </div>
 
               <div className="flex flex-col items-center gap-2 p-2 cursor-pointer border border-transparent hover:border-dotted hover:border-win-gray-dark active:bg-win-blue active:text-white transition-colors">
-                <div className="w-12 h-12 bg-green-500 shadow-win-outset flex items-center justify-center text-3xl select-none">
+                <div className="w-16 h-16 bg-green-500 shadow-win-outset flex items-center justify-center text-4xl select-none">
                   🐍
                 </div>
                 <span className="text-sm bg-transparent px-1">Cyber_Snake.exe</span>
@@ -65,7 +64,7 @@ export default function Desktop() {
             </div>
           </div>
         </WindowFrame>
-      </div>
+      </section>
 
     </main>
   );
