@@ -4,13 +4,13 @@ export default function Desktop() {
   return (
     <main className="h-screen w-full overflow-y-auto snap-y snap-mandatory flex flex-col items-center scroll-smooth relative z-0">
       
-      {/* HTML5 Video Background */}
+      {/* Global HTML5 Video Background (Visible in Section 1 and 3) */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="fixed top-0 left-0 w-full h-full object-cover -z-10 pointer-events-none"
+        className="fixed top-0 left-0 w-full h-full object-cover -z-10 pointer-events-none transform-gpu"
       >
         <source src="/Rowdy-Turbo-s/hero.mp4" type="video/mp4" />
       </video>
@@ -19,7 +19,7 @@ export default function Desktop() {
       <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center">
         <WindowFrame title="WELCOME.TXT" width="w-full max-w-3xl">
           <div className="bg-white p-4 shadow-win-inset text-black font-pixel">
-            <h1 className="text-4xl font-starborn mb-4 mt-2 uppercase">SudoApt-ARTfolio</h1>
+            <h1 className="text-4xl font-starborn mb-4 mt-2 uppercase">SUDOAPT-ARTFOLIO</h1>
             <p className="text-xl mb-4 text-win-blue">Requiem For Your Dream</p>
             <p className="text-lg leading-tight mb-4">
               Do Whatever you want to do in the Morning, the thing that makes your heart pound out of joy and Keeps your mind at ea$e.
@@ -32,10 +32,25 @@ export default function Desktop() {
         </WindowFrame>
       </section>
 
-      {/* Section 2: Media Player Window */}
-      <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center">
+      {/* Section 2: Media Player Window (WITH UNIQUE BACKGROUND) */}
+      <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center relative overflow-hidden">
+        
+        {/* Unique Background Video for Section 2 */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover -z-10 pointer-events-none transform-gpu"
+        >
+          <source src="/Rowdy-Turbo-s/music.mp4" type="video/mp4" />
+        </video>
+
+        {/* Dark overlay to ensure the Spotify UI stands out against the bright clouds/grass */}
+        <div className="absolute inset-0 bg-black/40 -z-10 pointer-events-none"></div>
+
         <WindowFrame title="MEDIA_PLAYER.EXE" width="w-full max-w-3xl">
-           <div className="bg-black shadow-win-inset p-1">
+           <div className="bg-black shadow-win-inset p-1 relative z-10">
              <iframe 
                 src="https://open.spotify.com/embed/playlist/0vvXsWCC9xrXsKd4FyS8kM?utm_source=generator&theme=0" 
                 width="100%" 
