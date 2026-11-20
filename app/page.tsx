@@ -32,7 +32,7 @@ export default function Desktop() {
         </WindowFrame>
       </section>
 
-      {/* Section 2: Media Player Window (WITH UNIQUE BACKGROUND) */}
+      {/* Section 2: Media Player Window */}
       <section className="w-full min-h-screen flex-shrink-0 flex items-center justify-center p-4 sm:p-8 snap-center relative overflow-hidden">
         
         {/* Unique Background Video for Section 2 */}
@@ -46,7 +46,7 @@ export default function Desktop() {
           <source src="/Rowdy-Turbo-s/music.mp4" type="video/mp4" />
         </video>
 
-        {/* Dark overlay to ensure the Spotify UI stands out against the bright clouds/grass */}
+        {/* Dark overlay for readability */}
         <div className="absolute inset-0 bg-black/40 -z-10 pointer-events-none"></div>
 
         <WindowFrame title="MEDIA_PLAYER.EXE" width="w-full max-w-3xl">
@@ -72,6 +72,7 @@ export default function Desktop() {
             
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
               
+              {/* Game 1: Rowdy Turbo */}
               <div className="flex flex-col items-center gap-2 p-2 cursor-pointer border border-transparent hover:border-dotted hover:border-win-gray-dark active:bg-win-blue active:text-white transition-colors">
                 <div className="w-16 h-16 bg-red-500 shadow-win-outset flex items-center justify-center text-4xl select-none">
                   🚗
@@ -79,12 +80,26 @@ export default function Desktop() {
                 <span className="text-sm bg-transparent px-1">Rowdy_Turbo.exe</span>
               </div>
 
+              {/* Game 2: Cyber Snake */}
               <div className="flex flex-col items-center gap-2 p-2 cursor-pointer border border-transparent hover:border-dotted hover:border-win-gray-dark active:bg-win-blue active:text-white transition-colors">
                 <div className="w-16 h-16 bg-green-500 shadow-win-outset flex items-center justify-center text-4xl select-none">
                   🐍
                 </div>
                 <span className="text-sm bg-transparent px-1">Cyber_Snake.exe</span>
               </div>
+
+              {/* Game 3: External Redirect to Need For Speed */}
+              <a
+                href="https://needforspeed.retrodrive.workers.dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center gap-2 p-2 cursor-pointer border border-transparent hover:border-dotted hover:border-win-gray-dark active:bg-win-blue active:text-white transition-colors no-underline text-black"
+              >
+                <div className="w-16 h-16 bg-blue-600 shadow-win-outset flex items-center justify-center text-4xl select-none">
+                  🏎️
+                </div>
+                <span className="text-sm bg-transparent px-1">NFS_Retro.exe</span>
+              </a>
               
             </div>
           </div>
